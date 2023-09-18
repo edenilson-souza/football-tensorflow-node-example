@@ -10,7 +10,22 @@ const matches = [
     { homeScore: 20, awayScore: 15, result: "Win" },
     { homeScore: 15, awayScore: 20, result: "Loss" },
     { homeScore: 20, awayScore: 20, result: "Loss" },
-    { homeScore: 26, awayScore: 25, result: "Win" }
+    { homeScore: 26, awayScore: 25, result: "Win" },
+    { homeScore: 25, awayScore: 26, result: "Loss" },
+    { homeScore: 25, awayScore: 25, result: "Loss" },
+    { homeScore: 1, awayScore: 2, result: "Loss" },
+    { homeScore: 1, awayScore: 0, result: "Win" },
+    { homeScore: 1, awayScore: 1, result: "Loss" },
+    { homeScore: 2, awayScore: 1, result: "Win" },
+    { homeScore: 0, awayScore: 1, result: "Loss" },
+    { homeScore: 1, awayScore: 1, result: "Loss" },
+    { homeScore: 1, awayScore: 2, result: "Loss" },
+    { homeScore: 3, awayScore: 0, result: "Win" },
+    { homeScore: 1, awayScore: 0, result: "Win" },
+    { homeScore: 2, awayScore: 0, result: "Win" },
+    { homeScore: 0, awayScore: 1, result: "Loss" },
+    { homeScore: 0, awayScore: 0, result: "Loss" },
+    { homeScore: 0, awayScore: 2, result: "Loss" }
     // Adicione mais partidas aqui...
 ];
 
@@ -41,14 +56,20 @@ model.compile({ optimizer: tf.train.adam(), loss: "binaryCrossentropy", metrics:
 
 // Treinando o modelo
 async function trainModel() {
+    const epochsTotal = 10000;
+    // const epochsPerBatch = 10;
+    // const batchSize = 4;
+    const verbose = 1;
     await model
         .fit(xData, yData, {
-            epochs: 10000,
-            verbose: 1,
+            epochs: epochsTotal,
+            verbose: verbose,
+            // batchSize: batchSize,
+            // stepsPerEpoch: Math.ceil(xData.shape[0] / batchSize) * epochsPerBatch,
             shuffle: true,
             callbacks: {
                 onEpochEnd: (epoch: any, logs: any) => {
-                    console.log(`Epoch ${epoch + 1}/${100} - loss: ${logs?.loss.toFixed(4)} - acc: ${logs?.acc.toFixed(4)}`);
+                    console.log(`Epoch ${epoch + 1}/${epochsTotal} - loss: ${logs?.loss.toFixed(4)} - acc: ${logs?.acc.toFixed(4)}`);
                 }
             }
         })
@@ -56,7 +77,8 @@ async function trainModel() {
             console.log("Treinamento concluído.");
             model.summary();
             //SAVE
-            model.save("file://./model").then(() => {
+            const trainDate = new Date();
+            model.save(`file://./${trainDate.getTime()}`).then(() => {
                 console.log("Modelo salvo.");
             });
         });
